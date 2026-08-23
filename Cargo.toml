@@ -1,0 +1,45 @@
+[package]
+name = "flareperf"
+version = "0.1.0"
+edition = "2024"
+authors = ["Brandon Hubbard <bhubbard@users.noreply.github.com>"]
+description = "Unified Cloudflare Edge Performance & Budget Guardian — Bundle size budgets, V8 isolate cold-start analysis, 50-subrequest limits, and D1 batching."
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/bhubbard/flareperf"
+homepage = "https://bhubbard.github.io/flareperf"
+keywords = ["cloudflare", "performance", "workers", "ast", "cli"]
+categories = ["command-line-utilities", "development-tools"]
+
+[lib]
+name = "flareperf"
+path = "src/lib.rs"
+
+[[bin]]
+name = "flareperf"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive", "cargo", "env"] }
+clap_complete = "4.5"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+flate2 = "1.1"
+brotli = "8.0"
+zstd = "0.13"
+wasmparser = "0.244"
+colored = "3.1"
+comfy-table = "7.2"
+walkdir = "2.5"
+vlq = "0.5"
+regex = "1.11"
+thiserror = "2.0"
+anyhow = "1.0"
+
+# OXC AST Parser for JS/TS
+oxc_allocator = "0.146.0"
+oxc_ast = "0.146.0"
+oxc_parser = "0.146.0"
+oxc_span = "0.146.0"
+
+[dev-dependencies]
+tempfile = "3.17"

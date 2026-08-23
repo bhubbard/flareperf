@@ -1,0 +1,29 @@
+name: "Flareperf Edge Performance & Budget Check"
+description: "Audit Cloudflare Worker & Pages bundle sizes, V8 isolate cold-start complexity, 50-subrequest limits, and D1 query batching."
+author: "Brandon Hubbard <bhubbard@users.noreply.github.com>"
+branding:
+  icon: "zap"
+  color: "blue"
+
+inputs:
+  command:
+    description: "Subcommand to run: check, bundle, isolate, subrequests, d1"
+    required: false
+    default: "check"
+  path:
+    description: "Path to project, build directory, or Worker entrypoint"
+    required: false
+    default: "."
+  strict:
+    description: "Fail the workflow step if any performance budget is breached"
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run Flareperf
+      shell: bash
+      run: |
+        echo "⚡ Running Flareperf ${{ inputs.command }} on ${{ inputs.path }}..."
+        cargo run --manifest-path ${{ github.action_path }}/Cargo.toml --release -- ${{ inputs.command }} ${{ inputs.path }} ${{ inputs.strict == 'true' && '--strict' || '' }}

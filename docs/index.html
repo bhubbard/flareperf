@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>flareperf — Unified Cloudflare Edge Performance & Budget Guardian</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --card-bg: #121212;
+      --border: #262626;
+      --border-accent: #333333;
+      --text: #ffffff;
+      --text-muted: #888888;
+      --accent: #3b82f6;
+      --accent-hover: #60a5fa;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background-color: var(--bg); color: var(--text); font-family: var(--font-sans); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+    header { border-bottom: 1px solid var(--border); padding: 3rem 0 2.5rem; }
+    .badge { display: inline-flex; align-items: center; gap: 0.5rem; font-family: var(--font-mono); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0.25rem 0.6rem; border: 1px solid var(--border); background: var(--card-bg); color: var(--accent); margin-bottom: 1.5rem; }
+    h1 { font-size: 3rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 1rem; line-height: 1.1; }
+    .tagline { font-size: 1.25rem; color: var(--text-muted); max-width: 750px; margin-bottom: 2rem; font-weight: 400; }
+    .actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.75rem 1.5rem; font-family: var(--font-mono); font-size: 0.9rem; font-weight: 600; text-decoration: none; border-radius: 0; cursor: pointer; transition: all 0.15s ease; }
+    .btn-primary { background: var(--text); color: var(--bg); border: 1px solid var(--text); }
+    .btn-primary:hover { background: #e5e5e5; }
+    .btn-secondary { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { border-color: var(--text-muted); }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin: 3.5rem 0; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); padding: 2rem; }
+    .card:hover { border-color: var(--border-accent); }
+    .card-tag { font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+    .card h3 { font-size: 1.35rem; font-weight: 700; margin-bottom: 0.75rem; }
+    .card p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem; }
+    .code-block { background: #000000; border: 1px solid var(--border); padding: 1.25rem; font-family: var(--font-mono); font-size: 0.85rem; overflow-x: auto; color: #e5e5e5; margin-bottom: 2rem; }
+    .code-comment { color: #666; }
+    footer { border-top: 1px solid var(--border); padding: 3rem 0; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+    footer a { color: var(--text); text-decoration: none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="badge">⚡ THE FLARE SUITE / PERFORMANCE</div>
+      <h1>flareperf</h1>
+      <p class="tagline">Unified Cloudflare Edge Performance & Budget Guardian. Enforce bundle limits, analyze V8 isolate cold-start latency, verify 50-subrequest limits, and eliminate D1 N+1 queries.</p>
+      <div class="actions">
+        <a href="https://github.com/bhubbard/flareperf" class="btn btn-primary">View on GitHub</a>
+        <a href="#quickstart" class="btn btn-secondary">Get Started</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="grid">
+      <div class="card">
+        <div class="card-tag">Subcommand: bundle</div>
+        <h3>📦 Edge Bundle Size Quotas</h3>
+        <p>Enforce gzip, brotli, and zstd size budgets against Free (1MB), Paid (10MB), and Workers AI (5MB) tiers with full sourcemap package decompositions.</p>
+        <code>flareperf bundle dist/_worker.js</code>
+      </div>
+
+      <div class="card">
+        <div class="card-tag">Subcommand: isolate</div>
+        <h3>🧊 Isolate Cold-Start Analyzer</h3>
+        <p>OXC AST engine analyzing global module scope outside request handlers to detect synchronous loops and heavy parsing that trigger Cloudflare Error 1101.</p>
+        <code>flareperf isolate src/index.ts</code>
+      </div>
+
+      <div class="card">
+        <div class="card-tag">Subcommand: subrequests</div>
+        <h3>🌐 50-Subrequest Limit Linter</h3>
+        <p>Detects unbounded <code>Promise.all</code> loops, recursive fan-outs, and unbatched edge storage calls that breach Cloudflare's 50 subrequest limit (Error 1042).</p>
+        <code>flareperf subrequests src/</code>
+      </div>
+
+      <div class="card">
+        <div class="card-tag">Subcommand: d1</div>
+        <h3>🗄️ D1 N+1 Query Advisor</h3>
+        <p>Flags SQLite queries inside loops and generates <code>env.DB.batch([stmt1, stmt2])</code> refactoring suggestions for single-roundtrip execution.</p>
+        <code>flareperf d1 src/</code>
+      </div>
+    </div>
+
+    <section id="quickstart" style="margin-bottom: 4rem;">
+      <h2 style="font-size: 1.8rem; margin-bottom: 1.5rem;">Pre-Deploy CI/CD Integration</h2>
+      <div class="code-block">
+<span class="code-comment"># In your .github/workflows/ci.yml</span>
+- name: Edge Performance &amp; Budget Check
+  uses: bhubbard/flareperf@main
+  with:
+    command: check
+    strict: true
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>Built with Rust 2024 &amp; OXC. Part of the <a href="https://github.com/bhubbard">Brandon Hubbard</a> Cloudflare Developer Toolchain.</p>
+    </div>
+  </footer>
+</body>
+</html>
