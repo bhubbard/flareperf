@@ -1,0 +1,8 @@
+/target
+**/*.rs.bk
+*.DS_Store
+node_modules/
+npm/bin/flareperf
+npm/bin/flareperf.exe
+npm/*.tgz
+dist/

@@ -9,6 +9,14 @@ repository = "https://github.com/bhubbard/flareperf"
 homepage = "https://bhubbard.github.io/flareperf"
 keywords = ["cloudflare", "performance", "workers", "ast", "cli"]
 categories = ["command-line-utilities", "development-tools"]
+readme = "README.md"
+exclude = [
+    "tests/*",
+    "docs/*",
+    ".github/*",
+    "npm/*",
+    "action.yml",
+]
 
 [lib]
 name = "flareperf"

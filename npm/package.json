@@ -1,0 +1,42 @@
+{
+  "name": "flareperf",
+  "version": "0.1.0",
+  "description": "Unified Cloudflare Edge Performance & Budget Guardian — Bundle size budgets, V8 isolate cold-start analysis, 50-subrequest limits, and D1 batching.",
+  "main": "bin/flareperf.js",
+  "bin": {
+    "flareperf": "bin/flareperf.js"
+  },
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bhubbard/flareperf.git"
+  },
+  "keywords": [
+    "cloudflare",
+    "workers",
+    "performance",
+    "pages",
+    "budgets",
+    "cli",
+    "linter",
+    "cold-start",
+    "d1",
+    "subrequests"
+  ],
+  "author": "Brandon Hubbard <bhubbard@users.noreply.github.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bhubbard/flareperf/issues"
+  },
+  "homepage": "https://bhubbard.github.io/flareperf",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "bin/flareperf.js",
+    "install.js",
+    "README.md"
+  ]
+}
