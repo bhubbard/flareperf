@@ -238,5 +238,6 @@ pub fn render_sarif(report: &AuditReport) -> Result<String, String> {
         }],
     };
 
-    serde_json::to_string_pretty(&sarif).map_err(|e| format!("Failed to serialize SARIF report: {e}"))
+    serde_json::to_string_pretty(&sarif)
+        .map_err(|e| format!("Failed to serialize SARIF report: {e}"))
 }

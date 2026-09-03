@@ -1,5 +1,5 @@
 use crate::bundle::analyzer::AuditReport;
-use crate::bundle::budget::{format_bytes, BudgetStatus};
+use crate::bundle::budget::{BudgetStatus, format_bytes};
 use colored::Colorize;
 use comfy_table::modifiers::UTF8_ROUND_CORNERS;
 use comfy_table::presets::UTF8_FULL;
@@ -44,7 +44,10 @@ pub fn render_terminal(report: &AuditReport, use_color: bool) -> String {
     let headroom_str = if eval.headroom_bytes >= 0 {
         format!("{} remaining", format_bytes(eval.headroom_bytes as usize))
     } else {
-        format!("+{} over limit", format_bytes((-eval.headroom_bytes) as usize))
+        format!(
+            "+{} over limit",
+            format_bytes((-eval.headroom_bytes) as usize)
+        )
     };
 
     let usage_bar = render_ascii_bar(eval.usage_percentage, 15);
@@ -59,7 +62,11 @@ pub fn render_terminal(report: &AuditReport, use_color: bool) -> String {
 
     budget_table.add_row(vec![
         Cell::new(&eval.name),
-        Cell::new(format!("{} ({})", format_bytes(eval.used_bytes), eval.compression)),
+        Cell::new(format!(
+            "{} ({})",
+            format_bytes(eval.used_bytes),
+            eval.compression
+        )),
         Cell::new(format_bytes(eval.limit_bytes)),
         Cell::new(format!("{:.1}% {}", eval.usage_percentage, usage_bar)),
         Cell::new(headroom_str),

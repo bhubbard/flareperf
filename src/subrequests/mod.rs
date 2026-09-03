@@ -36,7 +36,11 @@ pub fn analyze_subrequests(path: &Path, content: &str) -> Result<SubrequestRepor
     let parser_ret = Parser::new(&allocator, content, source_type).parse();
 
     if !parser_ret.diagnostics.is_empty() {
-        return Err(format!("AST parsing error in {}: {:?}", path.display(), parser_ret.diagnostics[0]));
+        return Err(format!(
+            "AST parsing error in {}: {:?}",
+            path.display(),
+            parser_ret.diagnostics[0]
+        ));
     }
 
     let program = parser_ret.program;
@@ -45,7 +49,14 @@ pub fn analyze_subrequests(path: &Path, content: &str) -> Result<SubrequestRepor
     let mut fanouts = 0usize;
 
     for stmt in &program.body {
-        walk_statement(stmt, content, false, &mut total_calls, &mut fanouts, &mut issues);
+        walk_statement(
+            stmt,
+            content,
+            false,
+            &mut total_calls,
+            &mut fanouts,
+            &mut issues,
+        );
     }
 
     Ok(SubrequestReport {
@@ -86,13 +97,27 @@ fn walk_statement(
             }
         }
         Statement::IfStatement(s) => {
-            walk_statement(&s.consequent, content, in_loop, total_calls, fanouts, issues);
+            walk_statement(
+                &s.consequent,
+                content,
+                in_loop,
+                total_calls,
+                fanouts,
+                issues,
+            );
             if let Some(alt) = &s.alternate {
                 walk_statement(alt, content, in_loop, total_calls, fanouts, issues);
             }
         }
         Statement::ExpressionStatement(s) => {
-            walk_expression(&s.expression, content, in_loop, total_calls, fanouts, issues);
+            walk_expression(
+                &s.expression,
+                content,
+                in_loop,
+                total_calls,
+                fanouts,
+                issues,
+            );
         }
         Statement::VariableDeclaration(s) => {
             for decl in &s.declarations {
@@ -101,22 +126,20 @@ fn walk_statement(
                 }
             }
         }
-        Statement::ExportDefaultDeclaration(s) => {
-            match &s.declaration {
-                ExportDefaultDeclarationKind::FunctionDeclaration(func) => {
-                    if let Some(body) = &func.body {
-                        for inner in &body.statements {
-                            walk_statement(inner, content, in_loop, total_calls, fanouts, issues);
-                        }
-                    }
-                }
-                decl => {
-                    if let Some(expr) = decl.as_expression() {
-                        walk_expression(expr, content, in_loop, total_calls, fanouts, issues);
+        Statement::ExportDefaultDeclaration(s) => match &s.declaration {
+            ExportDefaultDeclarationKind::FunctionDeclaration(func) => {
+                if let Some(body) = &func.body {
+                    for inner in &body.statements {
+                        walk_statement(inner, content, in_loop, total_calls, fanouts, issues);
                     }
                 }
             }
-        }
+            decl => {
+                if let Some(expr) = decl.as_expression() {
+                    walk_expression(expr, content, in_loop, total_calls, fanouts, issues);
+                }
+            }
+        },
         Statement::FunctionDeclaration(func) => {
             if let Some(body) = &func.body {
                 for inner in &body.statements {
@@ -156,7 +179,8 @@ fn walk_expression(
             }
 
             // Check for Promise.all(items.map(fetch))
-            if is_promise_all(&call.callee) && !call.arguments.is_empty()
+            if is_promise_all(&call.callee)
+                && !call.arguments.is_empty()
                 && let Some(Argument::ArrayExpression(arr)) = call.arguments.first()
                 && arr.elements.len() > 50
             {
@@ -180,7 +204,14 @@ fn walk_expression(
             }
         }
         Expression::AwaitExpression(await_expr) => {
-            walk_expression(&await_expr.argument, content, in_loop, total_calls, fanouts, issues);
+            walk_expression(
+                &await_expr.argument,
+                content,
+                in_loop,
+                total_calls,
+                fanouts,
+                issues,
+            );
         }
         Expression::ObjectExpression(obj) => {
             for prop in &obj.properties {
@@ -189,7 +220,14 @@ fn walk_expression(
                         walk_expression(&p.value, content, in_loop, total_calls, fanouts, issues);
                     }
                     ObjectPropertyKind::SpreadProperty(s) => {
-                        walk_expression(&s.argument, content, in_loop, total_calls, fanouts, issues);
+                        walk_expression(
+                            &s.argument,
+                            content,
+                            in_loop,
+                            total_calls,
+                            fanouts,
+                            issues,
+                        );
                     }
                 }
             }
@@ -222,7 +260,12 @@ fn is_subrequest_call(expr: &Expression) -> bool {
         Expression::Identifier(ident) => ident.name == "fetch",
         Expression::StaticMemberExpression(member) => {
             let prop = &member.property.name;
-            prop == "fetch" || prop == "get" || prop == "put" || prop == "delete" || prop == "all" || prop == "run"
+            prop == "fetch"
+                || prop == "get"
+                || prop == "put"
+                || prop == "delete"
+                || prop == "all"
+                || prop == "run"
         }
         _ => false,
     }
@@ -247,17 +290,41 @@ fn get_line_number(content: &str, byte_offset: u32) -> usize {
 
 pub fn render_terminal_subrequests(report: &SubrequestReport) -> String {
     let mut out = String::new();
-    out.push_str(&format!("{}: {}\n", "File".bold(), report.file_path.display().to_string().cyan()));
-    out.push_str(&format!("Total Subrequest Callsites: {} | Fanouts in Loops: {}\n", report.total_subrequest_callsites, report.detected_fanouts));
+    out.push_str(&format!(
+        "{}: {}\n",
+        "File".bold(),
+        report.file_path.display().to_string().cyan()
+    ));
+    out.push_str(&format!(
+        "Total Subrequest Callsites: {} | Fanouts in Loops: {}\n",
+        report.total_subrequest_callsites, report.detected_fanouts
+    ));
 
     if report.issues.is_empty() {
-        out.push_str(&format!("{} All subrequest patterns within safe 50-call limits!\n", "✓".green().bold()));
+        out.push_str(&format!(
+            "{} All subrequest patterns within safe 50-call limits!\n",
+            "✓".green().bold()
+        ));
     } else {
-        out.push_str(&format!("{} Found {} subrequest fanout risks:\n\n", "✗".red().bold(), report.issues.len()));
+        out.push_str(&format!(
+            "{} Found {} subrequest fanout risks:\n\n",
+            "✗".red().bold(),
+            report.issues.len()
+        ));
         for (idx, issue) in report.issues.iter().enumerate() {
-            out.push_str(&format!("{}. [{}] {} (Line {}) - {}\n", idx + 1, issue.severity.red().bold(), issue.rule_id.cyan(), issue.line, issue.title.bold()));
+            out.push_str(&format!(
+                "{}. [{}] {} (Line {}) - {}\n",
+                idx + 1,
+                issue.severity.red().bold(),
+                issue.rule_id.cyan(),
+                issue.line,
+                issue.title.bold()
+            ));
             out.push_str(&format!("   Description: {}\n", issue.description));
-            out.push_str(&format!("   Remediation: {}\n\n", issue.recommendation.dimmed()));
+            out.push_str(&format!(
+                "   Remediation: {}\n\n",
+                issue.recommendation.dimmed()
+            ));
         }
     }
 

@@ -3,7 +3,7 @@ use clap_complete::Shell;
 use std::path::PathBuf;
 
 /// ⚡ Flareperf — Unified Cloudflare Edge Performance & Budget Guardian
-/// 
+///
 /// High-performance Rust CLI & library providing Worker bundle size budgets,
 /// V8 isolate cold-start analysis, 50-subrequest limit verification, and D1 batching checks.
 #[derive(Parser, Debug)]

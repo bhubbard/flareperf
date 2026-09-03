@@ -1,5 +1,5 @@
-use flate2::write::GzEncoder;
 use flate2::Compression;
+use flate2::write::GzEncoder;
 use serde::{Deserialize, Serialize};
 use std::io::Write;
 
@@ -27,7 +27,9 @@ impl std::str::FromStr for CompressionAlgo {
             "zstd" | "zst" => Ok(CompressionAlgo::Zstd),
             "raw" | "none" => Ok(CompressionAlgo::Raw),
             "all" => Ok(CompressionAlgo::All),
-            _ => Err(format!("Unknown compression algorithm: {s}. Supported: gzip, brotli, zstd, raw, all")),
+            _ => Err(format!(
+                "Unknown compression algorithm: {s}. Supported: gzip, brotli, zstd, raw, all"
+            )),
         }
     }
 }

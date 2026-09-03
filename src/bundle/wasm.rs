@@ -147,9 +147,10 @@ pub fn analyze_wasm_bytes(file_path: &str, data: &[u8]) -> Result<WasmAnalysis, 
 
                 for export in reader {
                     if let Ok(exp) = export
-                        && exported_functions.len() < 25 {
-                            exported_functions.push(format!("{} ({:?})", exp.name, exp.kind));
-                        }
+                        && exported_functions.len() < 25
+                    {
+                        exported_functions.push(format!("{} ({:?})", exp.name, exp.kind));
+                    }
                 }
 
                 sections.push(WasmSectionInfo {
@@ -221,9 +222,7 @@ pub fn analyze_wasm_bytes(file_path: &str, data: &[u8]) -> Result<WasmAnalysis, 
                 let range = reader.range();
                 let size = range.end - range.start;
 
-                let is_debug = name == "name"
-                    || name.starts_with(".debug_")
-                    || name == "producers";
+                let is_debug = name == "name" || name.starts_with(".debug_") || name == "producers";
 
                 if is_debug {
                     debug_symbol_bytes += size;
@@ -310,8 +309,8 @@ pub fn analyze_wasm_bytes(file_path: &str, data: &[u8]) -> Result<WasmAnalysis, 
 }
 
 pub fn analyze_wasm_file(path: &Path) -> Result<WasmAnalysis, String> {
-    let bytes = fs::read(path)
-        .map_err(|e| format!("Failed to read WASM file {}: {e}", path.display()))?;
+    let bytes =
+        fs::read(path).map_err(|e| format!("Failed to read WASM file {}: {e}", path.display()))?;
     analyze_wasm_bytes(&path.to_string_lossy(), &bytes)
 }
 

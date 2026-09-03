@@ -148,11 +148,7 @@ pub fn analyze_sourcemap(
         let map_name = map_path.to_string_lossy();
         if let Some(base) = map_name.strip_suffix(".map") {
             let p = PathBuf::from(base);
-            if p.exists() {
-                Some(p)
-            } else {
-                None
-            }
+            if p.exists() { Some(p) } else { None }
         } else {
             None
         }

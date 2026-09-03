@@ -1,4 +1,4 @@
-use crate::bundle::budget::{parse_size_str, BudgetConfig, TierPreset};
+use crate::bundle::budget::{BudgetConfig, TierPreset, parse_size_str};
 use crate::bundle::compress::CompressionAlgo;
 use crate::bundle::report::OutputFormat;
 use clap::Parser;

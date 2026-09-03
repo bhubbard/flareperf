@@ -1,4 +1,4 @@
-use flareperf::bundle::analyzer::{analyze_target, AnalyzerOptions};
+use flareperf::bundle::analyzer::{AnalyzerOptions, analyze_target};
 use flareperf::bundle::budget::{BudgetConfig, TierPreset};
 use flareperf::bundle::compress::CompressionAlgo;
 use std::fs;
@@ -8,7 +8,11 @@ use tempfile::tempdir;
 fn test_bundle_within_free_tier() {
     let dir = tempdir().unwrap();
     let file = dir.path().join("_worker.js");
-    fs::write(&file, "export default { async fetch() { return new Response('Hello'); } };").unwrap();
+    fs::write(
+        &file,
+        "export default { async fetch() { return new Response('Hello'); } };",
+    )
+    .unwrap();
 
     let cfg = BudgetConfig {
         preset: TierPreset::Free,

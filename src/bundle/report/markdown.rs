@@ -1,5 +1,5 @@
 use crate::bundle::analyzer::AuditReport;
-use crate::bundle::budget::{format_bytes, BudgetStatus};
+use crate::bundle::budget::{BudgetStatus, format_bytes};
 
 pub fn render_markdown(report: &AuditReport) -> String {
     let mut out = String::new();
@@ -10,10 +10,15 @@ pub fn render_markdown(report: &AuditReport) -> String {
         BudgetStatus::Breach => ("🔴", "BREACH"),
     };
 
-    out.push_str(&format!("# {badge} Cloudflare Edge Bundle Budget: {title_status}\n\n"));
+    out.push_str(&format!(
+        "# {badge} Cloudflare Edge Bundle Budget: {title_status}\n\n"
+    ));
     out.push_str(&format!("**Target:** `{}`  \n", report.target_path));
     out.push_str(&format!("**Analyzed at:** `{}`  \n", report.analyzed_at));
-    out.push_str(&format!("**Total Assets:** {} files\n\n", report.file_count));
+    out.push_str(&format!(
+        "**Total Assets:** {} files\n\n",
+        report.file_count
+    ));
 
     // Policy Card
     let eval = &report.main_budget_eval;
@@ -21,16 +26,32 @@ pub fn render_markdown(report: &AuditReport) -> String {
     out.push_str("| Metric | Value |\n");
     out.push_str("| :--- | :--- |\n");
     out.push_str(&format!("| **Policy / Tier** | {} |\n", eval.name));
-    out.push_str(&format!("| **Evaluated Size** | {} ({}) |\n", format_bytes(eval.used_bytes), eval.compression));
-    out.push_str(&format!("| **Budget Limit** | {} |\n", format_bytes(eval.limit_bytes)));
-    out.push_str(&format!("| **Quota Utilization** | **{:.1}%** |\n", eval.usage_percentage));
+    out.push_str(&format!(
+        "| **Evaluated Size** | {} ({}) |\n",
+        format_bytes(eval.used_bytes),
+        eval.compression
+    ));
+    out.push_str(&format!(
+        "| **Budget Limit** | {} |\n",
+        format_bytes(eval.limit_bytes)
+    ));
+    out.push_str(&format!(
+        "| **Quota Utilization** | **{:.1}%** |\n",
+        eval.usage_percentage
+    ));
     let headroom_str = if eval.headroom_bytes >= 0 {
         format!("{} remaining", format_bytes(eval.headroom_bytes as usize))
     } else {
-        format!("**+{} OVER BUDGET**", format_bytes((-eval.headroom_bytes) as usize))
+        format!(
+            "**+{} OVER BUDGET**",
+            format_bytes((-eval.headroom_bytes) as usize)
+        )
     };
     out.push_str(&format!("| **Headroom** | {} |\n", headroom_str));
-    out.push_str(&format!("| **Status** | **{}** |\n\n", eval.status.as_str()));
+    out.push_str(&format!(
+        "| **Status** | **{}** |\n\n",
+        eval.status.as_str()
+    ));
 
     // Assets Summary Table
     out.push_str("## 📁 Asset Breakdown\n\n");

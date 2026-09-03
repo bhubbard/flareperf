@@ -2,8 +2,8 @@ use crate::bundle::budget::{
     BudgetConfig, BudgetEvaluation, BudgetStatus, CLOUDFLARE_PAGES_ASSET_BYTES,
 };
 use crate::bundle::compress::{CompressionAlgo, CompressionMetrics};
-use crate::bundle::sourcemap::{analyze_sourcemap, find_sourcemap_for_file, SourcemapAnalysis};
-use crate::bundle::wasm::{analyze_wasm_file, WasmAnalysis};
+use crate::bundle::sourcemap::{SourcemapAnalysis, analyze_sourcemap, find_sourcemap_for_file};
+use crate::bundle::wasm::{WasmAnalysis, analyze_wasm_file};
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -35,8 +35,8 @@ impl FileType {
         match ext.as_str() {
             "js" | "mjs" | "cjs" | "ts" | "jsx" | "tsx" => FileType::WorkerScript,
             "wasm" => FileType::WasmModule,
-            "html" | "css" | "svg" | "png" | "jpg" | "jpeg" | "gif" | "webp" | "avif"
-            | "woff" | "woff2" | "ttf" | "eot" | "ico" | "json" | "xml" | "txt" | "pdf" => {
+            "html" | "css" | "svg" | "png" | "jpg" | "jpeg" | "gif" | "webp" | "avif" | "woff"
+            | "woff2" | "ttf" | "eot" | "ico" | "json" | "xml" | "txt" | "pdf" => {
                 FileType::StaticAsset
             }
             _ => FileType::Other,
@@ -158,8 +158,8 @@ pub fn analyze_target(options: &AnalyzerOptions) -> Result<AuditReport, String> 
                 .to_string()
         };
 
-        let data = fs::read(path)
-            .map_err(|e| format!("Failed to read file '{}': {e}", path.display()))?;
+        let data =
+            fs::read(path).map_err(|e| format!("Failed to read file '{}': {e}", path.display()))?;
         let metrics = CompressionMetrics::calculate(&data);
 
         total_raw_bytes += metrics.raw_bytes;
@@ -226,12 +226,16 @@ pub fn analyze_target(options: &AnalyzerOptions) -> Result<AuditReport, String> 
     // If auditing a single file, evaluate that file.
     // If auditing a directory, evaluate the total bundle size (or primary worker script size)
     let evaluated_bytes = if target.is_file() {
-        analyzed_files[0].metrics.size_for(options.budget_config.compression)
+        analyzed_files[0]
+            .metrics
+            .size_for(options.budget_config.compression)
     } else {
         // If directory has worker scripts, sum WorkerScript + WasmModule compressed sizes for Worker quota
         let bundle_compressed: usize = analyzed_files
             .iter()
-            .filter(|f| f.file_type == FileType::WorkerScript || f.file_type == FileType::WasmModule)
+            .filter(|f| {
+                f.file_type == FileType::WorkerScript || f.file_type == FileType::WasmModule
+            })
             .map(|f| f.metrics.size_for(options.budget_config.compression))
             .sum();
 
@@ -274,9 +278,10 @@ pub fn analyze_target(options: &AnalyzerOptions) -> Result<AuditReport, String> 
                 let p = Path::new(&file.path);
                 if let Some(map_path) = find_sourcemap_for_file(p)
                     && !sourcemaps_to_analyze.contains(&map_path)
-                        && let Ok(analysis) = analyze_sourcemap(&map_path, None) {
-                            sourcemap_results.push(analysis);
-                        }
+                    && let Ok(analysis) = analyze_sourcemap(&map_path, None)
+                {
+                    sourcemap_results.push(analysis);
+                }
             }
         }
     }

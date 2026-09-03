@@ -35,7 +35,11 @@ pub fn analyze_d1_usage(path: &Path, content: &str) -> Result<D1Report, String> 
     let parser_ret = Parser::new(&allocator, content, source_type).parse();
 
     if !parser_ret.diagnostics.is_empty() {
-        return Err(format!("AST parsing error in {}: {:?}", path.display(), parser_ret.diagnostics[0]));
+        return Err(format!(
+            "AST parsing error in {}: {:?}",
+            path.display(),
+            parser_ret.diagnostics[0]
+        ));
     }
 
     let program = parser_ret.program;
@@ -65,10 +69,18 @@ fn walk_stmt_d1(
 ) {
     match stmt {
         Statement::ForStatement(s) => walk_stmt_d1(&s.body, content, true, total_d1, loops, issues),
-        Statement::ForInStatement(s) => walk_stmt_d1(&s.body, content, true, total_d1, loops, issues),
-        Statement::ForOfStatement(s) => walk_stmt_d1(&s.body, content, true, total_d1, loops, issues),
-        Statement::WhileStatement(s) => walk_stmt_d1(&s.body, content, true, total_d1, loops, issues),
-        Statement::DoWhileStatement(s) => walk_stmt_d1(&s.body, content, true, total_d1, loops, issues),
+        Statement::ForInStatement(s) => {
+            walk_stmt_d1(&s.body, content, true, total_d1, loops, issues)
+        }
+        Statement::ForOfStatement(s) => {
+            walk_stmt_d1(&s.body, content, true, total_d1, loops, issues)
+        }
+        Statement::WhileStatement(s) => {
+            walk_stmt_d1(&s.body, content, true, total_d1, loops, issues)
+        }
+        Statement::DoWhileStatement(s) => {
+            walk_stmt_d1(&s.body, content, true, total_d1, loops, issues)
+        }
         Statement::BlockStatement(s) => {
             for inner in &s.body {
                 walk_stmt_d1(inner, content, in_loop, total_d1, loops, issues);
@@ -97,22 +109,20 @@ fn walk_stmt_d1(
                 }
             }
         }
-        Statement::ExportDefaultDeclaration(s) => {
-            match &s.declaration {
-                ExportDefaultDeclarationKind::FunctionDeclaration(func) => {
-                    if let Some(body) = &func.body {
-                        for inner in &body.statements {
-                            walk_stmt_d1(inner, content, in_loop, total_d1, loops, issues);
-                        }
-                    }
-                }
-                decl => {
-                    if let Some(expr) = decl.as_expression() {
-                        walk_expr_d1(expr, content, in_loop, total_d1, loops, issues);
+        Statement::ExportDefaultDeclaration(s) => match &s.declaration {
+            ExportDefaultDeclarationKind::FunctionDeclaration(func) => {
+                if let Some(body) = &func.body {
+                    for inner in &body.statements {
+                        walk_stmt_d1(inner, content, in_loop, total_d1, loops, issues);
                     }
                 }
             }
-        }
+            decl => {
+                if let Some(expr) = decl.as_expression() {
+                    walk_expr_d1(expr, content, in_loop, total_d1, loops, issues);
+                }
+            }
+        },
         _ => {}
     }
 }
@@ -206,17 +216,40 @@ fn get_line_number(content: &str, byte_offset: u32) -> usize {
 
 pub fn render_terminal_d1(report: &D1Report) -> String {
     let mut out = String::new();
-    out.push_str(&format!("{}: {}\n", "File".bold(), report.file_path.display().to_string().cyan()));
-    out.push_str(&format!("Total D1 Callsites: {} | N+1 Loops: {}\n", report.total_d1_queries, report.n_plus_one_loops));
+    out.push_str(&format!(
+        "{}: {}\n",
+        "File".bold(),
+        report.file_path.display().to_string().cyan()
+    ));
+    out.push_str(&format!(
+        "Total D1 Callsites: {} | N+1 Loops: {}\n",
+        report.total_d1_queries, report.n_plus_one_loops
+    ));
 
     if report.issues.is_empty() {
-        out.push_str(&format!("{} No D1 query batching bottlenecks detected!\n", "✓".green().bold()));
+        out.push_str(&format!(
+            "{} No D1 query batching bottlenecks detected!\n",
+            "✓".green().bold()
+        ));
     } else {
-        out.push_str(&format!("{} Found {} D1 performance optimization opportunities:\n\n", "⚠".yellow().bold(), report.issues.len()));
+        out.push_str(&format!(
+            "{} Found {} D1 performance optimization opportunities:\n\n",
+            "⚠".yellow().bold(),
+            report.issues.len()
+        ));
         for (idx, issue) in report.issues.iter().enumerate() {
-            out.push_str(&format!("{}. [PERF] {} (Line {}) - {}\n", idx + 1, issue.rule_id.cyan(), issue.line, issue.title.bold()));
+            out.push_str(&format!(
+                "{}. [PERF] {} (Line {}) - {}\n",
+                idx + 1,
+                issue.rule_id.cyan(),
+                issue.line,
+                issue.title.bold()
+            ));
             out.push_str(&format!("   Description: {}\n", issue.description));
-            out.push_str(&format!("   Remediation: {}\n\n", issue.recommendation.dimmed()));
+            out.push_str(&format!(
+                "   Remediation: {}\n\n",
+                issue.recommendation.dimmed()
+            ));
         }
     }
 

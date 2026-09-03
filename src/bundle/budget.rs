@@ -247,7 +247,10 @@ mod tests {
         assert_eq!(parse_size_str("1KiB").unwrap(), 1024);
         assert_eq!(parse_size_str("1MB").unwrap(), 1024 * 1024);
         assert_eq!(parse_size_str("10MB").unwrap(), 10 * 1024 * 1024);
-        assert_eq!(parse_size_str("1.5MB").unwrap(), (1.5 * 1024.0 * 1024.0) as usize);
+        assert_eq!(
+            parse_size_str("1.5MB").unwrap(),
+            (1.5 * 1024.0 * 1024.0) as usize
+        );
         assert_eq!(parse_size_str("25MB").unwrap(), 25 * 1024 * 1024);
     }
 
