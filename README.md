@@ -4,7 +4,7 @@
 > Enforce Worker bundle size budgets, analyze V8 isolate cold-start latency, verify 50-subrequest limits, and eliminate D1 SQLite N+1 query bottlenecks.
 
 [![CI](https://github.com/bhubbard/flareperf/actions/workflows/ci.yml/badge.svg)](https://github.com/bhubbard/flareperf/actions)
-[![GitHub Pages](https://img.shields.io/badge/docs-bhubbard.github.io%2Fflareperf-black?style=flat-square&logo=github)](https://bhubbard.github.io/flareperf/)
+[![GitHub Pages](https://img.shields.io/badge/docs-code.brandonhubbard.com%2Fflareperf-black?style=flat-square&logo=github)](https://code.brandonhubbard.com/flareperf/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
 
 ---
